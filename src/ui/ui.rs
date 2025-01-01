@@ -1,9 +1,9 @@
 use crate::config::TermConfig;
-use ratatui::{crossterm::event::KeyCode, Frame};
+use ratatui::Frame;
 
 use super::{
     main_menu::MainMenu,
-    test::{self, Test},
+    test::{Test},
 };
 
 #[derive(Debug, PartialEq)]
