@@ -44,7 +44,10 @@ impl<'a> MainMenu<'a> {
                 self.current_selection += 1;
             }
             KeyCode::Enter => match self.current_selection {
-                0 => self.tx.send(TypieEvent::ChangeScreen(Screens::Test)).unwrap(),
+                0 => self
+                    .tx
+                    .send(TypieEvent::ChangeScreen(Screens::Test))
+                    .unwrap(),
                 3 => self.tx.send(TypieEvent::Exit).unwrap(),
                 _ => {}
             },

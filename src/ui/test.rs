@@ -1,27 +1,31 @@
 use std::sync::mpsc::Sender;
 
 use ratatui::{
-    crossterm::event::KeyCode, layout::{Constraint, Layout, Rect}, style::Stylize, widgets::{Block, Borders, Paragraph}, Frame
+    crossterm::event::KeyCode,
+    layout::{Constraint, Layout, Rect},
+    style::Stylize,
+    widgets::{Block, Borders, Paragraph},
+    Frame,
 };
 
 use crate::{config::TermConfig, typie::TypieEvent, utils::center};
 
 pub struct Test<'a> {
     term_config: &'a TermConfig,
-    tx: Sender<TypieEvent>
+    tx: Sender<TypieEvent>,
 }
 
 impl<'a> Test<'a> {
     pub fn new(term_config: &'a TermConfig, tx: Sender<TypieEvent>) -> Self {
-        Self {
-            term_config,
-            tx
-        }
+        Self { term_config, tx }
     }
 
     pub fn handle_input(&mut self, key: KeyCode) {
         match key {
-            KeyCode::Esc => self.tx.send(TypieEvent::ChangeScreen(super::Screens::MainMenu)).unwrap(),
+            KeyCode::Esc => self
+                .tx
+                .send(TypieEvent::ChangeScreen(super::Screens::MainMenu))
+                .unwrap(),
             _ => {}
         }
     }
@@ -71,7 +75,7 @@ impl<'a> Test<'a> {
             vec!["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
             area,
             0,
-            0
+            0,
         );
 
         self.render_row_keyboard(
@@ -79,7 +83,7 @@ impl<'a> Test<'a> {
             vec!["A", "S", "D", "F", "G", "H", "J", "K", "L"],
             area,
             3,
-            3
+            3,
         );
 
         self.render_row_keyboard(
@@ -87,7 +91,7 @@ impl<'a> Test<'a> {
             vec!["Z", "X", "C", "V", "B", "N", "M"],
             area,
             9,
-            6
+            6,
         );
 
         // Spacebar
@@ -97,16 +101,26 @@ impl<'a> Test<'a> {
         );
     }
 
-    fn render_row_keyboard(&self, frame: &mut Frame<'_>, letters: Vec<&str>, area: &Rect, x_offset: u16, y_offset: u16) {
-        for (i, letter) in letters
-            .iter()
-            .enumerate() {
+    fn render_row_keyboard(
+        &self,
+        frame: &mut Frame<'_>,
+        letters: Vec<&str>,
+        area: &Rect,
+        x_offset: u16,
+        y_offset: u16,
+    ) {
+        for (i, letter) in letters.iter().enumerate() {
             frame.render_widget(
                 Paragraph::new(letter.to_string())
                     .bold()
                     .centered()
                     .block(Block::new().borders(Borders::ALL)),
-                Rect::new(area.x + x_offset + i as u16 * 6, area.y + y_offset, 5, 3),
+                Rect::new(
+                    area.x + x_offset + i as u16 * 6,
+                    area.y + y_offset,
+                    5,
+                    3,
+                ),
             );
         }
     }

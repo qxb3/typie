@@ -6,7 +6,10 @@ use ratatui::{
     Terminal,
 };
 use std::{
-    io::Stdout, sync::mpsc::{channel, Receiver, Sender}, thread, time::Duration
+    io::Stdout,
+    sync::mpsc::{channel, Receiver, Sender},
+    thread,
+    time::Duration,
 };
 
 use crate::{
@@ -19,7 +22,7 @@ pub enum TypieEvent {
     Tick,
     KeyPress(KeyCode),
     ChangeScreen(Screens),
-    Exit
+    Exit,
 }
 
 pub struct Typie<'a> {
@@ -78,7 +81,7 @@ impl<'a> Typie<'a> {
                 }
                 TypieEvent::KeyPress(key) => ui.handle_input(key),
                 TypieEvent::ChangeScreen(screen) => ui.change_screen(screen),
-                TypieEvent::Exit => break
+                TypieEvent::Exit => break,
             }
         }
 
@@ -88,24 +91,20 @@ impl<'a> Typie<'a> {
     }
 
     fn handle_input(&self, tx: Sender<TypieEvent>) {
-        thread::spawn(move || {
-            loop {
-                match event::read().unwrap() {
-                    Event::Key(key) if key.kind == KeyEventKind::Press => {
-                        tx.send(TypieEvent::KeyPress(key.code)).unwrap();
-                    }
-                    _ => {}
+        thread::spawn(move || loop {
+            match event::read().unwrap() {
+                Event::Key(key) if key.kind == KeyEventKind::Press => {
+                    tx.send(TypieEvent::KeyPress(key.code)).unwrap();
                 }
+                _ => {}
             }
         });
     }
 
     fn tick(&self, tx: Sender<TypieEvent>) {
-        thread::spawn(move || {
-            loop {
-                tx.send(TypieEvent::Tick).unwrap();
-                thread::sleep(Duration::from_millis(80));
-            }
+        thread::spawn(move || loop {
+            tx.send(TypieEvent::Tick).unwrap();
+            thread::sleep(Duration::from_millis(80));
         });
     }
 }
