@@ -108,7 +108,7 @@ impl<'a> MainMenu<'a> {
 
         frame.render_widget(
             exit_seclection,
-            Rect::new(area.x, area.y + 4, self.term_config.width, 1),
+            Rect::new(area.x, area.y + 6, self.term_config.width, 1),
         );
     }
 }
