@@ -1,4 +1,4 @@
-use std::process;
+use std::{process, sync::mpsc::Sender};
 
 use ratatui::{
     crossterm::{event::KeyCode, style::Color},
@@ -8,17 +8,21 @@ use ratatui::{
     Frame,
 };
 
-use crate::{config::TermConfig, utils::center};
+use crate::{config::TermConfig, typie::TypieEvent, utils::center};
+
+use super::Screens;
 
 pub struct MainMenu<'a> {
     term_config: &'a TermConfig,
+    tx: Sender<TypieEvent>,
     current_selection: usize,
 }
 
 impl<'a> MainMenu<'a> {
-    pub fn new(term_config: &'a TermConfig) -> Self {
+    pub fn new(term_config: &'a TermConfig, tx: Sender<TypieEvent>) -> Self {
         Self {
             term_config,
+            tx,
             current_selection: 0,
         }
     }
@@ -40,11 +44,8 @@ impl<'a> MainMenu<'a> {
                 self.current_selection += 1;
             }
             KeyCode::Enter => match self.current_selection {
-                3 => {
-                    println!("Exited.");
-                    ratatui::restore();
-                    process::exit(0);
-                }
+                0 => self.tx.send(TypieEvent::ChangeScreen(Screens::Test)).unwrap(),
+                3 => self.tx.send(TypieEvent::Exit).unwrap(),
                 _ => {}
             },
             _ => {}

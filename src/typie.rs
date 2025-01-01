@@ -6,21 +6,20 @@ use ratatui::{
     Terminal,
 };
 use std::{
-    io::Stdout,
-    sync::mpsc::{channel, Receiver, Sender},
-    thread,
-    time::Duration,
+    io::Stdout, sync::mpsc::{channel, Receiver, Sender}, thread, time::Duration
 };
 
 use crate::{
     config::{Config, TermConfig},
-    ui::Ui,
+    ui::{Screens, Ui},
     utils::center,
 };
 
-enum TypieEvent {
+pub enum TypieEvent {
     Tick,
     KeyPress(KeyCode),
+    ChangeScreen(Screens),
+    Exit
 }
 
 pub struct Typie<'a> {
@@ -41,11 +40,11 @@ impl<'a> Typie<'a> {
     }
 
     pub fn run(&mut self) -> Result<(), String> {
-        let mut ui = Ui::new(&self.term_config);
-
         let (tx, rx) = &self.channel;
         self.handle_input(tx.clone());
         self.tick(tx.clone());
+
+        let mut ui = Ui::new(&self.term_config, tx.clone());
 
         loop {
             let event = rx.recv().map_err(|err| {
@@ -77,13 +76,9 @@ impl<'a> Typie<'a> {
                         ui.draw(frame);
                     }).map_err(|err| format!("Failed to render frame: {err}"))?;
                 }
-                TypieEvent::KeyPress(key) => {
-                    if key == KeyCode::Esc {
-                        break;
-                    }
-
-                    ui.handle_input(key);
-                }
+                TypieEvent::KeyPress(key) => ui.handle_input(key),
+                TypieEvent::ChangeScreen(screen) => ui.change_screen(screen),
+                TypieEvent::Exit => break
             }
         }
 
@@ -93,21 +88,24 @@ impl<'a> Typie<'a> {
     }
 
     fn handle_input(&self, tx: Sender<TypieEvent>) {
-        thread::spawn(move || loop {
-            match event::read().unwrap() {
-                Event::Key(key) if key.kind == KeyEventKind::Press => {
-                    tx.send(TypieEvent::KeyPress(key.code)).unwrap();
+        thread::spawn(move || {
+            loop {
+                match event::read().unwrap() {
+                    Event::Key(key) if key.kind == KeyEventKind::Press => {
+                        tx.send(TypieEvent::KeyPress(key.code)).unwrap();
+                    }
+                    _ => {}
                 }
-                _ => {}
             }
         });
     }
 
     fn tick(&self, tx: Sender<TypieEvent>) {
-        thread::spawn(move || loop {
-            tx.send(TypieEvent::Tick).unwrap();
-
-            thread::sleep(Duration::from_millis(80));
+        thread::spawn(move || {
+            loop {
+                tx.send(TypieEvent::Tick).unwrap();
+                thread::sleep(Duration::from_millis(80));
+            }
         });
     }
 }
