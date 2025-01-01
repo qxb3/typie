@@ -8,16 +8,29 @@ use ratatui::{
     Frame,
 };
 
-use crate::{config::TermConfig, typie::TypieEvent, utils::center};
+use crate::{
+    config::{Config, TermConfig},
+    typie::TypieEvent,
+    utils::center,
+};
 
 pub struct Test<'a> {
+    config: &'a Config,
     term_config: &'a TermConfig,
     tx: Sender<TypieEvent>,
 }
 
 impl<'a> Test<'a> {
-    pub fn new(term_config: &'a TermConfig, tx: Sender<TypieEvent>) -> Self {
-        Self { term_config, tx }
+    pub fn new(
+        config: &'a Config,
+        term_config: &'a TermConfig,
+        tx: Sender<TypieEvent>,
+    ) -> Self {
+        Self {
+            config,
+            term_config,
+            tx,
+        }
     }
 
     pub fn handle_input(&mut self, key: KeyCode) {
@@ -66,7 +79,9 @@ impl<'a> Test<'a> {
             Rect::new(top.x, top.y + 2, self.term_config.width, 1),
         );
 
-        self.render_keyboard(frame, &bottom);
+        if self.config.show_keyboard {
+            self.render_keyboard(frame, &bottom);
+        }
     }
 
     fn render_keyboard(&self, frame: &mut Frame<'_>, area: &Rect) {

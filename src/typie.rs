@@ -47,7 +47,7 @@ impl<'a> Typie<'a> {
         self.handle_input(tx.clone());
         self.tick(tx.clone());
 
-        let mut ui = Ui::new(&self.term_config, tx.clone());
+        let mut ui = Ui::new(&self.config, &self.term_config, tx.clone());
 
         loop {
             let event = rx.recv().map_err(|err| {

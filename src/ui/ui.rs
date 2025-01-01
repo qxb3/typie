@@ -1,6 +1,9 @@
 use std::sync::mpsc::Sender;
 
-use crate::{config::TermConfig, typie::TypieEvent};
+use crate::{
+    config::{Config, TermConfig},
+    typie::TypieEvent,
+};
 use ratatui::{crossterm::event::KeyCode, Frame};
 
 use super::{main_menu::MainMenu, test::Test};
@@ -14,6 +17,7 @@ pub enum Screens {
 }
 
 pub struct Ui<'a> {
+    config: &'a Config,
     term_config: &'a TermConfig,
     pub current_screen: Screens,
     pub main_menu: MainMenu<'a>,
@@ -21,13 +25,18 @@ pub struct Ui<'a> {
 }
 
 impl<'a> Ui<'a> {
-    pub fn new(term_config: &'a TermConfig, tx: Sender<TypieEvent>) -> Self {
+    pub fn new(
+        config: &'a Config,
+        term_config: &'a TermConfig,
+        tx: Sender<TypieEvent>,
+    ) -> Self {
         Self {
+            config,
             term_config,
             current_screen: Screens::MainMenu,
 
             main_menu: MainMenu::new(term_config, tx.clone()),
-            test: Test::new(term_config, tx.clone()),
+            test: Test::new(config, term_config, tx.clone()),
         }
     }
 
