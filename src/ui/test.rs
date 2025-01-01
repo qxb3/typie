@@ -38,17 +38,17 @@ impl<'a> Test<'a> {
         frame.set_cursor_position(top.as_position());
 
         frame.render_widget(
-            Paragraph::new("fuck you"),
+            Paragraph::new("test foo"),
             Rect::new(top.x, top.y, self.term_config.width, 1),
         );
 
         frame.render_widget(
-            Paragraph::new("fuck you"),
+            Paragraph::new("test foo"),
             Rect::new(top.x, top.y + 1, self.term_config.width, 1),
         );
 
         frame.render_widget(
-            Paragraph::new("fuck you"),
+            Paragraph::new("test foo"),
             Rect::new(top.x, top.y + 2, self.term_config.width, 1),
         );
 
