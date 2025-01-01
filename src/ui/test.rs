@@ -1,19 +1,29 @@
+use std::sync::mpsc::Sender;
+
 use ratatui::{
-    layout::{Constraint, Layout, Rect},
-    style::Stylize,
-    widgets::{Block, Borders, Paragraph},
-    Frame,
+    crossterm::event::KeyCode, layout::{Constraint, Layout, Rect}, style::Stylize, widgets::{Block, Borders, Paragraph}, Frame
 };
 
-use crate::{config::TermConfig, utils::center};
+use crate::{config::TermConfig, typie::TypieEvent, utils::center};
 
 pub struct Test<'a> {
     term_config: &'a TermConfig,
+    tx: Sender<TypieEvent>
 }
 
 impl<'a> Test<'a> {
-    pub fn new(term_config: &'a TermConfig) -> Self {
-        Self { term_config }
+    pub fn new(term_config: &'a TermConfig, tx: Sender<TypieEvent>) -> Self {
+        Self {
+            term_config,
+            tx
+        }
+    }
+
+    pub fn handle_input(&mut self, key: KeyCode) {
+        match key {
+            KeyCode::Esc => self.tx.send(TypieEvent::ChangeScreen(super::Screens::MainMenu)).unwrap(),
+            _ => {}
+        }
     }
 
     pub fn draw(&self, frame: &mut Frame<'_>) {

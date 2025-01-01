@@ -27,7 +27,7 @@ impl<'a> Ui<'a> {
             current_screen: Screens::MainMenu,
 
             main_menu: MainMenu::new(term_config, tx.clone()),
-            test: Test::new(term_config),
+            test: Test::new(term_config, tx.clone()),
         }
     }
 
@@ -43,6 +43,7 @@ impl<'a> Ui<'a> {
     pub fn handle_input(&mut self, key: KeyCode) {
         match self.current_screen {
             Screens::MainMenu => self.main_menu.handle_input(key),
+            Screens::Test => self.test.handle_input(key),
             _ => {}
         }
     }
