@@ -1,10 +1,7 @@
 use crate::config::TermConfig;
 use ratatui::{crossterm::event::KeyCode, Frame};
 
-use super::{
-    main_menu::MainMenu,
-    test::Test,
-};
+use super::{main_menu::MainMenu, test::Test};
 
 #[derive(Debug, PartialEq)]
 pub enum Screens {

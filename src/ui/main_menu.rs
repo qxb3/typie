@@ -31,23 +31,21 @@ impl<'a> MainMenu<'a> {
                 }
 
                 self.current_selection -= 1;
-            },
+            }
             KeyCode::Down => {
                 if self.current_selection == 3 {
                     return;
                 }
 
                 self.current_selection += 1;
-            },
-            KeyCode::Enter => {
-                match self.current_selection {
-                    3 => {
-                        println!("Exited.");
-                        ratatui::restore();
-                        process::exit(0);
-                    },
-                    _ => {}
+            }
+            KeyCode::Enter => match self.current_selection {
+                3 => {
+                    println!("Exited.");
+                    ratatui::restore();
+                    process::exit(0);
                 }
+                _ => {}
             },
             _ => {}
         }
