@@ -1,5 +1,5 @@
-mod ui;
 mod main_menu;
 mod test;
+mod ui;
 
 pub use ui::Ui;

@@ -1,7 +1,7 @@
-mod config;
 mod cli;
-mod ui;
+mod config;
 mod typie;
+mod ui;
 mod utils;
 
 use std::process;

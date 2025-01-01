@@ -5,11 +5,16 @@ use crate::config::Config;
 
 #[derive(Debug, Parser)]
 struct TypieCli {
-    #[arg(short, long, value_name = "file", default_value = "~/.config/typie/config.json")]
+    #[arg(
+        short,
+        long,
+        value_name = "file",
+        default_value = "~/.config/typie/config.json"
+    )]
     config: Option<String>,
 
     #[arg(short, long, value_name = "boolean")]
-    show_keyboard: Option<bool>
+    show_keyboard: Option<bool>,
 }
 
 pub fn run() -> Result<Config, String> {

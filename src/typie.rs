@@ -1,18 +1,33 @@
-use std::{io::Stdout, sync::mpsc::{channel, Receiver, Sender}, thread, time::Duration};
-use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind}, layout::Constraint, prelude::CrosstermBackend, widgets::{Paragraph, Wrap}, Terminal};
+use ratatui::{
+    crossterm::event::{self, Event, KeyCode, KeyEventKind},
+    layout::Constraint,
+    prelude::CrosstermBackend,
+    widgets::{Paragraph, Wrap},
+    Terminal,
+};
+use std::{
+    io::Stdout,
+    sync::mpsc::{channel, Receiver, Sender},
+    thread,
+    time::Duration,
+};
 
-use crate::{config::{Config, TermConfig}, ui::Ui, utils::center};
+use crate::{
+    config::{Config, TermConfig},
+    ui::Ui,
+    utils::center,
+};
 
 enum TypieEvent {
     Tick,
-    KeyPress(KeyCode)
+    KeyPress(KeyCode),
 }
 
 pub struct Typie<'a> {
     config: &'a Config,
     term_config: TermConfig,
     terminal: Terminal<CrosstermBackend<Stdout>>,
-    channel: (Sender<TypieEvent>, Receiver<TypieEvent>)
+    channel: (Sender<TypieEvent>, Receiver<TypieEvent>),
 }
 
 impl<'a> Typie<'a> {
@@ -21,7 +36,7 @@ impl<'a> Typie<'a> {
             config,
             term_config: TermConfig::new(),
             terminal: ratatui::init(),
-            channel: channel()
+            channel: channel(),
         }
     }
 
@@ -33,8 +48,9 @@ impl<'a> Typie<'a> {
         self.tick(tx.clone());
 
         loop {
-            let event = rx.recv()
-                .map_err(|err| format!("Failed to receive typie_event: {err}"))?;
+            let event = rx.recv().map_err(|err| {
+                format!("Failed to receive typie_event: {err}")
+            })?;
 
             match event {
                 TypieEvent::Tick => {
@@ -60,7 +76,7 @@ impl<'a> Typie<'a> {
 
                         ui.draw(frame);
                     }).map_err(|err| format!("Failed to render frame: {err}"))?;
-                },
+                }
                 TypieEvent::KeyPress(key) => {
                     if key == KeyCode::Esc {
                         break;
@@ -75,27 +91,21 @@ impl<'a> Typie<'a> {
     }
 
     fn handle_input(&self, tx: Sender<TypieEvent>) {
-        thread::spawn(move || {
-            loop {
-                match event::read().unwrap() {
-                    Event::Key(key) if key.kind == KeyEventKind::Press => {
-                        tx.send(TypieEvent::KeyPress(key.code))
-                            .unwrap();
-                    },
-                    _ => {}
+        thread::spawn(move || loop {
+            match event::read().unwrap() {
+                Event::Key(key) if key.kind == KeyEventKind::Press => {
+                    tx.send(TypieEvent::KeyPress(key.code)).unwrap();
                 }
+                _ => {}
             }
         });
     }
 
     fn tick(&self, tx: Sender<TypieEvent>) {
-        thread::spawn(move || {
-            loop {
-                tx.send(TypieEvent::Tick)
-                    .unwrap();
+        thread::spawn(move || loop {
+            tx.send(TypieEvent::Tick).unwrap();
 
-                thread::sleep(Duration::from_millis(80));
-            }
+            thread::sleep(Duration::from_millis(80));
         });
     }
 }

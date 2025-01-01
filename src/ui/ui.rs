@@ -1,14 +1,17 @@
-use ratatui::{crossterm::event::KeyCode, Frame};
 use crate::config::TermConfig;
+use ratatui::{crossterm::event::KeyCode, Frame};
 
-use super::{main_menu::MainMenu, test::{self, Test}};
+use super::{
+    main_menu::MainMenu,
+    test::{self, Test},
+};
 
 #[derive(Debug, PartialEq)]
 pub enum Screens {
     MainMenu,
     Test,
     Help,
-    Settings
+    Settings,
 }
 
 pub struct Ui<'a> {
@@ -16,7 +19,7 @@ pub struct Ui<'a> {
     term_config: &'a TermConfig,
 
     main_menu: MainMenu<'a>,
-    test: Test<'a>
+    test: Test<'a>,
 }
 
 impl<'a> Ui<'a> {
@@ -26,7 +29,7 @@ impl<'a> Ui<'a> {
             current_screen: Screens::MainMenu,
 
             main_menu: MainMenu::new(term_config),
-            test: Test::new(term_config)
+            test: Test::new(term_config),
         }
     }
 
@@ -34,7 +37,7 @@ impl<'a> Ui<'a> {
         match self.current_screen {
             Screens::MainMenu => self.main_menu.draw(frame),
             Screens::Test => self.test.draw(frame),
-            Screens::Help => {},
+            Screens::Help => {}
             Screens::Settings => {}
         }
     }
