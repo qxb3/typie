@@ -1,8 +1,5 @@
 mod ui;
+mod main_menu;
 mod test;
 
-use ratatui::{crossterm::event::KeyCode, Frame};
-
-pub fn draw(frame: &mut Frame<'_>, key: &Option<KeyCode>) {
-    ui::draw(frame, key);
-}
+pub use ui::Ui;

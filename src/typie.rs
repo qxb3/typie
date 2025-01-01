@@ -1,7 +1,7 @@
 use std::{io::Stdout, sync::mpsc::{channel, Receiver, Sender}, thread, time::Duration};
-use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind}, prelude::CrosstermBackend, Terminal};
+use ratatui::{crossterm::event::{self, Event, KeyCode, KeyEventKind}, layout::Constraint, prelude::CrosstermBackend, widgets::{Paragraph, Wrap}, Terminal};
 
-use crate::{config::Config, ui};
+use crate::{config::{Config, TermConfig}, ui::Ui, utils::center};
 
 enum TypieEvent {
     Tick,
@@ -10,25 +10,25 @@ enum TypieEvent {
 
 pub struct Typie<'a> {
     config: &'a Config,
+    term_config: TermConfig,
     terminal: Terminal<CrosstermBackend<Stdout>>,
-    channel: (Sender<TypieEvent>, Receiver<TypieEvent>),
-    exit: bool
+    channel: (Sender<TypieEvent>, Receiver<TypieEvent>)
 }
 
 impl<'a> Typie<'a> {
     pub fn new(config: &'a Config) -> Self {
         Self {
             config,
+            term_config: TermConfig::new(),
             terminal: ratatui::init(),
-            channel: channel(),
-            exit: false
+            channel: channel()
         }
     }
 
     pub fn run(&mut self) -> Result<(), String> {
-        let mut letter_input: Option<KeyCode> = None;
-        let (tx, rx) = &self.channel;
+        let ui = Ui::new(&self.term_config);
 
+        let (tx, rx) = &self.channel;
         self.handle_input(tx.clone());
         self.tick(tx.clone());
 
@@ -39,17 +39,32 @@ impl<'a> Typie<'a> {
             match event {
                 TypieEvent::Tick => {
                     self.terminal.draw(|frame| {
-                        ui::draw(frame, &letter_input);
-                    }).map_err(|err| format!("Failed to render frame: {err}"))?;
+                        if frame.area().width < self.term_config.width ||
+                            frame.area().height < self.term_config.height {
+                            let message = format!(
+                                "Terminal is too small! Minimum width & height is: {}x{}",
+                                self.term_config.width,
+                                self.term_config.height
+                            );
+                            let message_len = message.len();
 
-                    letter_input = None;
+                            frame.render_widget(
+                                Paragraph::new(message)
+                                    .centered()
+                                    .wrap(Wrap::default()),
+                                center(Constraint::Length(message_len.to_owned() as u16), Constraint::Length(frame.area().height), frame.area())
+                            );
+
+                            return;
+                        }
+
+                        ui.draw(frame);
+                    }).map_err(|err| format!("Failed to render frame: {err}"))?;
                 },
                 TypieEvent::KeyPress(key) => {
                     if key == KeyCode::Esc {
                         break;
                     }
-
-                    letter_input = Some(key);
                 }
             }
         }

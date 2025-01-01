@@ -30,3 +30,17 @@ impl Config {
         }
     }
 }
+
+pub struct TermConfig {
+    pub width: u16,
+    pub height: u16
+}
+
+impl TermConfig {
+    pub fn new() -> Self {
+        Self {
+            width: 60,
+            height: 24
+        }
+    }
+}
