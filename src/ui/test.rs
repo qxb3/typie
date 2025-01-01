@@ -62,50 +62,52 @@ impl<'a> Test<'a> {
             Rect::new(top.x, top.y + 2, self.term_config.width, 1),
         );
 
-        for (i, letter) in ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"]
-            .iter()
-            .enumerate()
-        {
-            frame.render_widget(
-                Paragraph::new(letter.to_string())
-                    .bold()
-                    .centered()
-                    .block(Block::new().borders(Borders::ALL)),
-                Rect::new(bottom.x + i as u16 * 6, bottom.y, 5, 3),
-            );
-        }
+        self.render_keyboard(frame, &bottom);
+    }
 
-        for (i, letter) in ["A", "S", "D", "F", "G", "H", "J", "K", "L"]
-            .iter()
-            .enumerate()
-        {
-            frame.render_widget(
-                Paragraph::new(letter.to_string())
-                    .bold()
-                    .centered()
-                    .block(Block::new().borders(Borders::ALL)),
-                Rect::new(bottom.x + 3 + i as u16 * 6, bottom.y + 3, 5, 3),
-            );
-        }
-
-        for (i, letter) in
-            ["Z", "X", "C", "V", "B", "N", "M"].iter().enumerate()
-        {
-            frame.render_widget(
-                Paragraph::new(letter.to_string())
-                    .bold()
-                    .centered()
-                    .block(Block::new().borders(Borders::ALL)),
-                Rect::new(bottom.x + 9 + i as u16 * 6, bottom.y + 6, 5, 3),
-            );
-        }
-
-        frame.render_widget(
-            Paragraph::new("")
-                .bold()
-                .centered()
-                .block(Block::new().borders(Borders::ALL)),
-            Rect::new(bottom.x + 11, bottom.y + 9, 36, 3),
+    fn render_keyboard(&self, frame: &mut Frame<'_>, area: &Rect) {
+        self.render_row_keyboard(
+            frame,
+            vec!["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+            area,
+            0,
+            0
         );
+
+        self.render_row_keyboard(
+            frame,
+            vec!["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+            area,
+            3,
+            3
+        );
+
+        self.render_row_keyboard(
+            frame,
+            vec!["Z", "X", "C", "V", "B", "N", "M"],
+            area,
+            9,
+            6
+        );
+
+        // Spacebar
+        frame.render_widget(
+            Block::new().borders(Borders::ALL),
+            Rect::new(area.x + 11, area.y + 9, 36, 3),
+        );
+    }
+
+    fn render_row_keyboard(&self, frame: &mut Frame<'_>, letters: Vec<&str>, area: &Rect, x_offset: u16, y_offset: u16) {
+        for (i, letter) in letters
+            .iter()
+            .enumerate() {
+            frame.render_widget(
+                Paragraph::new(letter.to_string())
+                    .bold()
+                    .centered()
+                    .block(Block::new().borders(Borders::ALL)),
+                Rect::new(area.x + x_offset + i as u16 * 6, area.y + y_offset, 5, 3),
+            );
+        }
     }
 }
