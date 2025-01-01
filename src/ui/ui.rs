@@ -1,9 +1,9 @@
 use crate::config::TermConfig;
-use ratatui::Frame;
+use ratatui::{crossterm::event::KeyCode, Frame};
 
 use super::{
     main_menu::MainMenu,
-    test::{Test},
+    test::Test,
 };
 
 #[derive(Debug, PartialEq)]
@@ -15,11 +15,10 @@ pub enum Screens {
 }
 
 pub struct Ui<'a> {
-    pub current_screen: Screens,
     term_config: &'a TermConfig,
-
-    main_menu: MainMenu<'a>,
-    test: Test<'a>,
+    pub current_screen: Screens,
+    pub main_menu: MainMenu<'a>,
+    pub test: Test<'a>,
 }
 
 impl<'a> Ui<'a> {
@@ -42,7 +41,14 @@ impl<'a> Ui<'a> {
         }
     }
 
-    pub fn set_screen(&mut self, screen: Screens) {
-        self.current_screen = screen;
+    pub fn handle_input(&mut self, key: KeyCode) {
+        match self.current_screen {
+            Screens::MainMenu => self.main_menu.handle_input(key),
+            _ => {}
+        }
     }
+
+    // pub fn set_screen(&mut self, screen: Screens) {
+    //     self.current_screen = screen;
+    // }
 }

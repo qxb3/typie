@@ -1,5 +1,7 @@
+use std::process;
+
 use ratatui::{
-    crossterm::style::Color,
+    crossterm::{event::KeyCode, style::Color},
     layout::{Constraint, Layout, Rect},
     style::Stylize,
     text::Text,
@@ -8,24 +10,46 @@ use ratatui::{
 
 use crate::{config::TermConfig, utils::center};
 
-#[derive(PartialEq)]
-enum Selections {
-    Start,
-    Help,
-    Settings,
-    Exit,
-}
-
 pub struct MainMenu<'a> {
     term_config: &'a TermConfig,
-    current_selection: Selections,
+    current_selection: usize,
 }
 
 impl<'a> MainMenu<'a> {
     pub fn new(term_config: &'a TermConfig) -> Self {
         Self {
             term_config,
-            current_selection: Selections::Start,
+            current_selection: 0,
+        }
+    }
+
+    pub fn handle_input(&mut self, key: KeyCode) {
+        match key {
+            KeyCode::Up => {
+                if self.current_selection == 0 {
+                    return;
+                }
+
+                self.current_selection -= 1;
+            },
+            KeyCode::Down => {
+                if self.current_selection == 3 {
+                    return;
+                }
+
+                self.current_selection += 1;
+            },
+            KeyCode::Enter => {
+                match self.current_selection {
+                    3 => {
+                        println!("Exited.");
+                        ratatui::restore();
+                        process::exit(0);
+                    },
+                    _ => {}
+                }
+            },
+            _ => {}
         }
     }
 
@@ -72,22 +96,22 @@ impl<'a> MainMenu<'a> {
 
     fn draw_selections(&self, frame: &mut Frame<'_>, area: Rect) {
         let mut start_selection = Text::from("Start Test");
-        if self.current_selection == Selections::Start {
+        if self.current_selection == 0 {
             start_selection = Text::from("> Start Test").fg(Color::Blue);
         }
 
         let mut help_seclection = Text::from("Help");
-        if self.current_selection == Selections::Help {
+        if self.current_selection == 1 {
             help_seclection = Text::from("> Help").fg(Color::Blue);
         }
 
         let mut settings_seclection = Text::from("Settings");
-        if self.current_selection == Selections::Settings {
+        if self.current_selection == 2 {
             settings_seclection = Text::from("> Settings").fg(Color::Blue);
         }
 
         let mut exit_seclection = Text::from("Exit");
-        if self.current_selection == Selections::Exit {
+        if self.current_selection == 3 {
             exit_seclection = Text::from("> Exit").fg(Color::Blue);
         }
 

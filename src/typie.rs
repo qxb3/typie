@@ -41,7 +41,7 @@ impl<'a> Typie<'a> {
     }
 
     pub fn run(&mut self) -> Result<(), String> {
-        let ui = Ui::new(&self.term_config);
+        let mut ui = Ui::new(&self.term_config);
 
         let (tx, rx) = &self.channel;
         self.handle_input(tx.clone());
@@ -81,6 +81,8 @@ impl<'a> Typie<'a> {
                     if key == KeyCode::Esc {
                         break;
                     }
+
+                    ui.handle_input(key);
                 }
             }
         }
