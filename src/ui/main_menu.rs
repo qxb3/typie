@@ -1,4 +1,4 @@
-use std::{process, sync::mpsc::Sender};
+use std::sync::mpsc::Sender;
 
 use ratatui::{
     crossterm::{event::KeyCode, style::Color},
@@ -31,6 +31,7 @@ impl<'a> MainMenu<'a> {
         match key {
             KeyCode::Up => {
                 if self.current_selection == 0 {
+                    self.current_selection = 3;
                     return;
                 }
 
@@ -38,6 +39,7 @@ impl<'a> MainMenu<'a> {
             }
             KeyCode::Down => {
                 if self.current_selection == 3 {
+                    self.current_selection = 0;
                     return;
                 }
 
