@@ -14,6 +14,8 @@ use crate::{
     utils::center,
 };
 
+use super::Screens;
+
 pub struct Test<'a> {
     config: &'a Config,
     term_config: &'a TermConfig,
@@ -37,7 +39,7 @@ impl<'a> Test<'a> {
         match key {
             KeyCode::Esc => self
                 .tx
-                .send(TypieEvent::ChangeScreen(super::Screens::MainMenu))
+                .send(TypieEvent::ChangeScreen(Screens::MainMenu))
                 .unwrap(),
             _ => {}
         }
